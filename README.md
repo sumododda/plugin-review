@@ -1,6 +1,6 @@
 # review-plugin
 
-Security review skill for AI agent plugins, MCP servers, and extensions. Dispatches 4 parallel subagents to analyze a GitHub repository across 13 security dimensions, scores 79 checklist items, and generates a markdown report with an APPROVE / CONDITIONAL / DENY decision.
+Security review skill for AI agent plugins, MCP servers, and extensions. Dispatches 5 parallel subagents to analyze a GitHub repository across 13 security dimensions, scores 79 checklist items, and generates a markdown report with an APPROVE / CONDITIONAL / DENY decision.
 
 ## How It Works
 
@@ -11,12 +11,13 @@ Security review skill for AI agent plugins, MCP servers, and extensions. Dispatc
 1. Clones the repo
 2. Runs Trivy (CVE + license scan)
 3. Reads your org policy (`review-policy.json`)
-4. Dispatches 4 parallel review agents:
+4. Dispatches 5 parallel review agents:
 
 | Agent | What it checks |
 |---|---|
 | **manifest-auditor** | Dependencies, supply chain, licenses, critical blockers |
-| **code-scanner** | Secrets, dangerous code patterns, permissions, runtime safety |
+| **code-scanner** | Secrets, dangerous code patterns |
+| **permissions-runtime-scanner** | Permissions, execution scope, runtime sandboxing |
 | **network-mcp-scanner** | MCP/AI security, network destinations, data handling |
 | **ci-governance** | CI/CD hardening, repo health, documentation quality |
 
@@ -78,11 +79,12 @@ review-policy.json          # Org security policy config
 unified-checklist.md        # Full 79-item reference checklist
 reviews/                    # Generated reports
 prompts/
-  manifest-auditor.md       # Subagent prompt: deps, licenses, blockers
-  code-scanner.md           # Subagent prompt: secrets, SAST, permissions
-  network-mcp-scanner.md    # Subagent prompt: MCP, network, data
-  ci-governance.md          # Subagent prompt: CI/CD, repo health, docs
-  report-template.md        # Report output template
+  manifest-auditor.md             # Subagent: deps, licenses, blockers
+  code-scanner.md                 # Subagent: secrets, SAST
+  permissions-runtime-scanner.md  # Subagent: permissions, runtime
+  network-mcp-scanner.md          # Subagent: MCP, network, data
+  ci-governance.md                # Subagent: CI/CD, repo health, docs
+  report-template.md              # Report output template
 ```
 
 ## License

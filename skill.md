@@ -5,7 +5,7 @@ description: Use when evaluating a plugin, MCP server, skill, or extension for s
 
 # review-plugin
 
-4 subagents analyze 13 security dimensions in parallel, score 79 items, produce a markdown report with APPROVE / CONDITIONAL / DENY.
+5 subagents analyze 13 security dimensions in parallel, score 79 items, produce a markdown report with APPROVE / CONDITIONAL / DENY.
 
 ## When to Use
 
@@ -24,7 +24,8 @@ description: Use when evaluating a plugin, MCP server, skill, or extension for s
 | Agent | Dimensions | Reads |
 |---|---|---|
 | manifest-auditor | D3 Supply Chain, D11 License, Phase 0 Blockers | Manifests, lockfiles, LICENSE, Trivy output |
-| code-scanner | D1 Secrets, D2 SAST, D4 Permissions, D8 Runtime | Source code files |
+| code-scanner | D1 Secrets, D2 SAST | Source code, config files, git history |
+| permissions-runtime-scanner | D4 Permissions, D8 Runtime | Source code, Dockerfiles, sandbox configs |
 | network-mcp-scanner | D5 MCP/AI, D6 Network, D7 Data/Privacy | Source code, tool descriptions, configs |
 | ci-governance | D9 CI/CD, D10 Repo Health, D12 Ops/Docs | Workflows, git history, README, CHANGELOG |
 
@@ -53,9 +54,9 @@ Skip if trivy unavailable -- score SUP-02 and LIC-02 as N/A.
 ### Step 3: Read policy and dispatch
 
 1. Read `review-policy.json` from this skill's directory
-2. Read each prompt from `prompts/` directory: `manifest-auditor.md`, `code-scanner.md`, `network-mcp-scanner.md`, `ci-governance.md`
+2. Read each prompt from `prompts/` directory: `manifest-auditor.md`, `code-scanner.md`, `permissions-runtime-scanner.md`, `network-mcp-scanner.md`, `ci-governance.md`
 3. Replace `{CLONE_DIR}`, `{REPO_URL}`, `{ECOSYSTEM}`, and `{POLICY_*}` placeholders with actual values
-4. Dispatch all 4 agents in a **single message** (parallel)
+4. Dispatch all 5 agents in a **single message** (parallel)
 
 ### Step 4: Score and report
 
@@ -74,7 +75,7 @@ Write report to `reviews/{repo-name}-{date}.md` using template from `prompts/rep
 
 - **Forgetting to replace placeholders** -- agents get literal `{CLONE_DIR}` and grep fails silently
 - **Not reading policy file** -- agents skip org-specific blocked deps/licenses
-- **Running agents sequentially** -- must dispatch all 4 in one message for parallel execution
+- **Running agents sequentially** -- must dispatch all 5 in one message for parallel execution
 - **Scoring D13** -- Dynamic Testing is always N/A for static review, exclude from aggregate
 
 ## Dimension Weights
