@@ -55,20 +55,20 @@
 | 10 | Repository Health & Maintainer Trust | 5 | {D10_AVG} | {D10_WEIGHTED} |
 | 11 | Licensing & Legal Compliance | 4 | {D11_AVG} | {D11_WEIGHTED} |
 | 12 | Operational Security & Documentation | 5 | {D12_AVG} | {D12_WEIGHTED} |
-| 13 | Dynamic Testing & Fuzzing | 4 | N/A | N/A |
+| 13 | Dynamic Testing & Fuzzing | N/A | N/A | N/A |
 | | **TOTAL** | | | **{SCORE}/100** |
 
 ---
 
 ### Hard-Fail Gates
 
-| Gate | Triggered? | Evidence |
+| Gate | Status | Evidence |
 |---|---|---|
-| SEC-01 < 5 (secrets found) | {GATE_SEC01} | {GATE_SEC01_EVIDENCE} |
+| SEC-01 verified secret or private key | {GATE_SEC01} | {GATE_SEC01_EVIDENCE} |
 | SUP-02 critical CVE unmitigated | {GATE_SUP02} | {GATE_SUP02_EVIDENCE} |
-| MCP-01 scores 0-1 (prompt injection) | {GATE_MCP01} | {GATE_MCP01_EVIDENCE} |
-| PRM-06 scores 0-1 (no HITL) | {GATE_PRM06} | {GATE_PRM06_EVIDENCE} |
-| RUN-01 scores 0-1 (privileged) | {GATE_RUN01} | {GATE_RUN01_EVIDENCE} |
+| MCP-01 verified malicious prompt injection | {GATE_MCP01} | {GATE_MCP01_EVIDENCE} |
+| PRM-06 destructive operation lacks HITL | {GATE_PRM06} | {GATE_PRM06_EVIDENCE} |
+| RUN-01 privileged or root execution by default | {GATE_RUN01} | {GATE_RUN01_EVIDENCE} |
 
 ---
 

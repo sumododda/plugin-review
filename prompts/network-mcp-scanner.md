@@ -5,7 +5,25 @@ ECOSYSTEM: {ECOSYSTEM}
 
 ## Your Job
 
-Analyze MCP/AI-specific security, network destinations, and data privacy. Score each item 0-5.
+Analyze MCP/AI-specific security, network destinations, and data privacy. Score each item 0-5 using the rubric below.
+
+## Scoring Rubric
+
+- 5 = strong control, verified by direct evidence
+- 4 = good control with minor gaps
+- 3 = partial coverage or unclear implementation
+- 2 = weak control or significant gaps
+- 1 = control mostly absent
+- 0 = critical failure
+- N/A = capability absent or not assessable with static review
+
+## Evidence Standard
+
+- `VERIFIED` = direct tool-definition, code, or config evidence
+- `POTENTIAL` = heuristic signal that still needs human confirmation
+- `NO` = checked and not found
+
+Only mark `MCP-01` as `VERIFIED` when a tool or skill description contains a real hidden instruction that overrides user/system intent, suppresses disclosure, or directs silent unsafe behavior. Suspicious wording alone should be `POTENTIAL`, not `VERIFIED`.
 
 ## Org Policy
 
@@ -34,8 +52,8 @@ MCP-03 - Input trust boundaries:
 - Look for XML markers, delimiters, or sanitization before inserting into agent context
 
 MCP-04 - Tool description integrity:
-- Hash all tool description files for rug-pull baseline:
-  Run: find {CLONE_DIR} -name "*.json" -o -name "*.yaml" -o -name "*.yml" | xargs grep -l "description" 2>/dev/null | while read f; do shasum -a 256 "$f"; done
+- Hash all description-bearing tool files for a rug-pull baseline:
+  - rg -l "description|toolDescription" {CLONE_DIR} --glob "*.{json,yaml,yml,ts,js,py}" | while read -r f; do shasum -a 256 "$f"; done
 - Record the hashes
 
 MCP-05 - Auto-approval:
@@ -145,7 +163,7 @@ SCORES:
 - DAT-07: [0-5] - [one-line evidence]
 
 HARD-FAIL GATES:
-- MCP-01 scores 0-1? [yes/no] - [evidence]
+- MCP-01 hard-fail triggered? [VERIFIED/POTENTIAL/NO] - [evidence]
 
 NETWORK DESTINATIONS:
 | Domain | File | Blocked? |

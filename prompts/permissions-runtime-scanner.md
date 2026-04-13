@@ -5,7 +5,25 @@ ECOSYSTEM: {ECOSYSTEM}
 
 ## Your Job
 
-Assess permission boundaries, execution scope, and runtime sandboxing. Score each item 0-5.
+Assess permission boundaries, execution scope, and runtime sandboxing. Score each item 0-5 using the rubric below.
+
+## Scoring Rubric
+
+- 5 = strong control, verified by direct evidence
+- 4 = good control with minor gaps
+- 3 = partial coverage or unclear implementation
+- 2 = weak control or significant gaps
+- 1 = control mostly absent
+- 0 = critical failure
+- N/A = capability absent or not assessable with static review
+
+## Evidence Standard
+
+- `VERIFIED` = direct code, config, or runtime-definition evidence
+- `POTENTIAL` = heuristic signal that still needs human confirmation
+- `NO` = checked and not found
+
+Only mark `PRM-06` as `VERIFIED` when a destructive action can proceed without meaningful confirmation or an equivalent safety control. Only mark `RUN-01` as `VERIFIED` when privileged/root execution is the default or effectively required without strong justification.
 
 ## Org Policy
 
@@ -77,8 +95,8 @@ SCORES:
 - RUN-05: [0-5] - [one-line evidence]
 
 HARD-FAIL GATES:
-- PRM-06 scores 0-1? [yes/no] - [evidence]
-- RUN-01 scores 0-1? [yes/no] - [evidence]
+- PRM-06 hard-fail triggered? [VERIFIED/POTENTIAL/NO] - [evidence]
+- RUN-01 hard-fail triggered? [VERIFIED/POTENTIAL/NO] - [evidence]
 
 SENSITIVE PATH ACCESS:
 - [list each sensitive path reference with file:line, or "None found"]

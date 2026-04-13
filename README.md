@@ -1,16 +1,16 @@
 # review-plugin
 
-Security review skill for AI agent plugins, MCP servers, and extensions. Dispatches 5 parallel subagents to analyze a GitHub repository across 13 security dimensions, scores 79 checklist items, and generates a markdown report with an APPROVE / CONDITIONAL / DENY decision.
+Security review skill for AI agent plugins, MCP servers, and extensions. Dispatches 5 parallel subagents to analyze a GitHub repository across 12 scored security dimensions plus 1 static-review-only dimension, reviews 76 checklist items, and generates a markdown report with an APPROVE / CONDITIONAL / DENY decision.
 
 ## How It Works
 
-```
+```text
 /review-plugin https://github.com/org/some-mcp-server
 ```
 
-1. Clones the repo
-2. Runs Trivy (CVE + license scan)
-3. Reads your org policy (`review-policy.json`)
+1. Clones the repo with full history
+2. Runs Trivy (CVE + license scan) if available
+3. Reads your org policy (`review-policy.json`) and the canonical checklist (`unified-checklist.md`)
 4. Dispatches 5 parallel review agents:
 
 | Agent | What it checks |
@@ -27,8 +27,9 @@ Security review skill for AI agent plugins, MCP servers, and extensions. Dispatc
 ## Prerequisites
 
 ```bash
-brew install trivy    # only external tool needed
-brew install gh       # recommended, for repo metadata
+brew install trivy    # recommended: CVE + license scan
+brew install gh       # recommended: repo metadata and branch protection
+python3 --version     # used by scripts/validate-skill.py
 ```
 
 ## Org Policy
@@ -47,11 +48,17 @@ Edit `review-policy.json` to configure:
 
 | Decision | Score | Conditions |
 |---|---|---|
-| **APPROVE** | >= 85 | No hard-fail gates, no High-severity item below 3 |
-| **CONDITIONAL** | 70-84 | Remediation plan required within 30 days |
-| **DENY** | < 70 | Or any hard-fail gate triggered |
+| **APPROVE** | >= 85 | No verified hard-fail gates and every non-N/A item scores at least 3 |
+| **CONDITIONAL** | 70-84 | Or any hard-fail gate is only a potential signal pending human review |
+| **DENY** | < 70 | Or any Phase 0 blocker fails or any hard-fail gate is verified |
 
-**Hard-fail gates**: verified secrets found, unmitigated critical CVE, prompt injection in tool descriptions, no human-in-the-loop for destructive ops, privileged execution without justification.
+Hard-fail gates require `VERIFIED` evidence, not just a regex hit. The current gate set is:
+
+- verified secret or private key committed to the repo or history
+- unmitigated critical CVE in the shipped/default install path
+- verified malicious prompt injection in tool descriptions
+- destructive operations without meaningful human confirmation
+- privileged or root execution by default without strong justification
 
 ## 13 Security Dimensions
 
@@ -71,20 +78,36 @@ Edit `review-policy.json` to configure:
 | 12 | Operational Security & Documentation | 5 |
 | 13 | Dynamic Testing & Fuzzing | N/A (static review) |
 
+## Canonical Files
+
+- `unified-checklist.md` is the source of truth for checklist IDs, default severity, and hard-fail eligibility
+- `review-policy.json` is the source of truth for org-specific rules
+- `prompts/report-template.md` is the source of truth for final report layout
+
+## Validation
+
+Run the validator after editing the skill:
+
+```bash
+python3 scripts/validate-skill.py
+```
+
 ## File Structure
 
-```
+```text
 skill.md                    # Skill orchestrator (loaded by AI agent)
 review-policy.json          # Org security policy config
-unified-checklist.md        # Full 79-item reference checklist
+unified-checklist.md        # Full 76-item canonical checklist
 reviews/                    # Generated reports
+scripts/
+  validate-skill.py         # Drift checker for counts, placeholders, and templates
 prompts/
-  manifest-auditor.md             # Subagent: deps, licenses, blockers
-  code-scanner.md                 # Subagent: secrets, SAST
-  permissions-runtime-scanner.md  # Subagent: permissions, runtime
-  network-mcp-scanner.md          # Subagent: MCP, network, data
-  ci-governance.md                # Subagent: CI/CD, repo health, docs
-  report-template.md              # Report output template
+  manifest-auditor.md       # Subagent: deps, licenses, blockers
+  code-scanner.md           # Subagent: secrets and SAST
+  permissions-runtime-scanner.md
+  network-mcp-scanner.md    # Subagent: MCP, network, data
+  ci-governance.md          # Subagent: CI/CD, repo health, docs
+  report-template.md        # Report output template
 ```
 
 ## License

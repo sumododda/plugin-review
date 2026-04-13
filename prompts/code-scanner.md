@@ -5,7 +5,25 @@ ECOSYSTEM: {ECOSYSTEM}
 
 ## Your Job
 
-Scan source code for secrets and dangerous code patterns. Score each item 0-5.
+Scan source code for secrets and dangerous code patterns. Score each item 0-5 using the rubric below.
+
+## Scoring Rubric
+
+- 5 = strong control, verified by direct evidence
+- 4 = good control with minor gaps
+- 3 = partial coverage or unclear implementation
+- 2 = weak control or significant gaps
+- 1 = control mostly absent
+- 0 = critical failure
+- N/A = capability absent or not assessable with static review
+
+## Evidence Standard
+
+- `VERIFIED` = direct code, config, manifest, or git-history evidence
+- `POTENTIAL` = heuristic signal that still needs human confirmation
+- `NO` = checked and not found
+
+Only mark the `SEC-01` hard-fail gate as `VERIFIED` when a live secret, private key, or clearly sensitive credential is committed in the repo or history. Example/test strings or low-confidence regex hits can lower the score but should be `POTENTIAL`, not `VERIFIED`.
 
 ## Checklist Items
 
@@ -74,10 +92,10 @@ SCORES:
 - SCA-04: [0-5] - [one-line evidence]
 
 HARD-FAIL GATES:
-- SEC-01 < 5? [yes/no] - [evidence]
+- SEC-01 hard-fail triggered? [VERIFIED/POTENTIAL/NO] - [evidence]
 
 SECRETS FOUND:
-- [list each potential secret with file:line, or "None found"]
+- [list each verified or potential secret with file:line and why it is verified/potential, or "None found"]
 
 DANGEROUS PATTERNS:
 - [list each dangerous code pattern with file:line, or "None found"]

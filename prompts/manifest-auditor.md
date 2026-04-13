@@ -6,14 +6,25 @@ REPO URL: {REPO_URL}
 
 ## Your Job
 
-Review dependencies, licenses, and critical blockers. Score each item 0-5:
-- 5 = Meets requirement with strong evidence
-- 4 = Minor gaps, evidence present
-- 3 = Partial coverage
-- 2 = Weak, insufficient controls
-- 1 = Fail, missing control
-- 0 = Critical failure
-- N/A = Does not apply
+Review dependencies, licenses, and critical blockers. Score each item 0-5 using the rubric below.
+
+## Scoring Rubric
+
+- 5 = strong control, verified by direct evidence
+- 4 = good control with minor gaps
+- 3 = partial coverage or unclear implementation
+- 2 = weak control or significant gaps
+- 1 = control mostly absent
+- 0 = critical failure
+- N/A = capability absent or not assessable with static review
+
+## Evidence Standard
+
+- `VERIFIED` = direct manifest, lockfile, license, or scanner evidence
+- `POTENTIAL` = heuristic signal or incomplete scanner evidence that still needs confirmation
+- `NO` = checked and not found
+
+Only mark the `SUP-02` hard-fail gate as `VERIFIED` when a critical CVE affects the shipped dependency graph or default install path and there is no compensating control, documented exception, or fixed override in use. If `trivy` output is missing or ambiguous, use `POTENTIAL` or `N/A` instead.
 
 ## Phase 0: Critical Blockers
 
@@ -63,7 +74,7 @@ SUP-06 - Install scripts:
 - Read the "scripts" section of package.json (or equivalent)
 - Flag these hooks for review: {POLICY_INSTALL_SCRIPTS_FLAG}
 - For each flagged hook, READ the actual script content and summarize what it does
-- AUTO-DENY if: script downloads and runs remote code (curl|bash, wget|sh, etc.)
+- AUTO-DENY only if a script downloads and runs remote code (curl|bash, wget|sh, etc.)
 
 SUP-07 - Obfuscated code:
 - Grep for minified/obfuscated non-dist files in the repo
@@ -107,7 +118,7 @@ POLICY VIOLATIONS:
 
 SCORES:
 - SUP-01: [0-5] - [one-line evidence]
-- SUP-02: [0-5] - [one-line evidence]
+- SUP-02: [0-5 or N/A] - [one-line evidence]
 - SUP-03: [0-5] - [one-line evidence]
 - SUP-04: [0-5] - [one-line evidence]
 - SUP-05: [0-5] - [one-line evidence]
@@ -115,9 +126,12 @@ SCORES:
 - SUP-07: [0-5] - [one-line evidence]
 - SUP-08: [0-5] - [one-line evidence]
 - LIC-01: [0-5] - [one-line evidence]
-- LIC-02: [0-5] - [one-line evidence]
+- LIC-02: [0-5 or N/A] - [one-line evidence]
 - LIC-03: [0-5] - [one-line evidence]
 - LIC-04: [0-5] - [one-line evidence]
+
+HARD-FAIL GATES:
+- SUP-02 critical CVE gate? [VERIFIED/POTENTIAL/NO] - [evidence]
 
 INSTALL SCRIPTS FLAGGED:
 - [hook name]: [summary of what it does]
