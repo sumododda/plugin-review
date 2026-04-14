@@ -23,7 +23,12 @@ Scan source code for secrets and dangerous code patterns. Score each item 0-5 us
 - `POTENTIAL` = heuristic signal that still needs human confirmation
 - `NO` = checked and not found
 
-Only mark the `SEC-01` hard-fail gate as `VERIFIED` when a live secret, private key, or clearly sensitive credential is committed in the repo or history. Example/test strings or low-confidence regex hits can lower the score but should be `POTENTIAL`, not `VERIFIED`.
+Only mark the `SEC-01` critical flag as `VERIFIED` when a live secret, private key, or clearly sensitive credential is committed in the repo or history. Example/test strings or low-confidence regex hits can lower the score but should be `POTENTIAL`, not `VERIFIED`.
+
+## Extra Research
+
+- If an unfamiliar binary, package, credential format, or execution mechanism materially affects risk, use web research or vendor docs to identify it and include a concise explanation in the findings.
+- Prefer primary sources when available.
 
 ## Checklist Items
 
@@ -91,8 +96,8 @@ SCORES:
 - SCA-03: [0-5] - [one-line evidence]
 - SCA-04: [0-5] - [one-line evidence]
 
-HARD-FAIL GATES:
-- SEC-01 hard-fail triggered? [VERIFIED/POTENTIAL/NO] - [evidence]
+CRITICAL FLAGS:
+- SEC-01 critical flag? [VERIFIED/POTENTIAL/NO] - [evidence]
 
 SECRETS FOUND:
 - [list each verified or potential secret with file:line and why it is verified/potential, or "None found"]

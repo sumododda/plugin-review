@@ -6,7 +6,7 @@ REPO URL: {REPO_URL}
 
 ## Your Job
 
-Review dependencies, licenses, and critical blockers. Score each item 0-5 using the rubric below.
+Review dependencies, licenses, and supply-chain risk. Score each item 0-5 using the rubric below.
 
 ## Scoring Rubric
 
@@ -24,22 +24,28 @@ Review dependencies, licenses, and critical blockers. Score each item 0-5 using 
 - `POTENTIAL` = heuristic signal or incomplete scanner evidence that still needs confirmation
 - `NO` = checked and not found
 
-Only mark the `SUP-02` hard-fail gate as `VERIFIED` when a critical CVE affects the shipped dependency graph or default install path and there is no compensating control, documented exception, or fixed override in use. If `trivy` output is missing or ambiguous, use `POTENTIAL` or `N/A` instead.
+Only mark the `SUP-02` critical flag as `VERIFIED` when a critical CVE affects the shipped dependency graph or default install path and there is no compensating control, documented exception, or fixed override in use. If `trivy` output is missing or ambiguous, use `POTENTIAL` or `N/A` instead.
 
-## Phase 0: Critical Blockers
+## Extra Research
 
-Check these FIRST. If any trigger, note "BLOCKER TRIGGERED" prominently:
+- If an unfamiliar package, installer, license family, tunnel utility, or vendor service materially affects risk, use web research or vendor docs to identify it and add a short explanation to the report.
+- Prefer primary sources when available.
+
+## Baseline Checks
+
+Check these early and carry the results into the final report:
 
 - CB-04: Does a LICENSE file exist? (Read it if yes)
-- CB-05: Is the license in this deny list? {POLICY_BLOCKED_LICENSES_DENY}
-- CB-07: Is there obfuscated code with network calls? (Grep for minified non-dist files with fetch/http patterns)
+- CB-05: Can the project license be identified, and are any noteworthy terms called out? (for example strong copyleft, source-available, noncommercial, or unusual restrictions)
+- CB-07: Is there suspicious obfuscated code with network calls? (grep for minified non-dist files with fetch/http patterns)
 
-## Org Policy - Blocked Dependencies
+## Risk Heuristics
 
-These packages are blocked by policy. Check every dependency name against this list:
-{POLICY_BLOCKED_CAPABILITIES}
+These are not automatic failures. Flag them with context if found:
 
-For EACH blocked dependency found, report: package name, which capability category it falls under, and the reason it's blocked.
+- dependencies that enable tunneling, remote shells, crypto mining, keystroke logging, screen capture, or clipboard monitoring
+- install scripts that download or execute remote code
+- licenses or dependency-license mixes that may need human review
 
 ## Checklist Items
 
@@ -49,6 +55,10 @@ SUP-01 - Dependency inventory:
 - Read the manifest file (package.json, requirements.txt, go.mod, Cargo.toml, etc.)
 - Read the lockfile if present
 - List all direct dependencies with their versions
+- Build a complete dependency inventory for the final report:
+  - direct dependencies
+  - transitive dependencies when a lockfile or scanner output is available
+  - license for each dependency when available from scanner output or package metadata
 
 SUP-02 - Known CVEs:
 - Read {CLONE_DIR}/artifacts/trivy-vulns.json
@@ -72,9 +82,9 @@ SUP-05 - Typosquatting:
 
 SUP-06 - Install scripts:
 - Read the "scripts" section of package.json (or equivalent)
-- Flag these hooks for review: {POLICY_INSTALL_SCRIPTS_FLAG}
+- Flag these hooks for review: `preinstall`, `postinstall`, `preuninstall`, `postuninstall`, `prepare`, `prepublish`
 - For each flagged hook, READ the actual script content and summarize what it does
-- AUTO-DENY only if a script downloads and runs remote code (curl|bash, wget|sh, etc.)
+- If a script downloads and runs remote code (`curl | bash`, `wget | sh`, etc.), flag it as high risk and explain why
 
 SUP-07 - Obfuscated code:
 - Grep for minified/obfuscated non-dist files in the repo
@@ -83,18 +93,18 @@ SUP-07 - Obfuscated code:
 SUP-08 - Dependency count:
 - Count direct dependencies
 - If lockfile exists, count total (transitive) dependencies
-- Compare against limits: max direct = {POLICY_MAX_DIRECT_DEPS}, max total = {POLICY_MAX_TOTAL_DEPS}
+- Note if the dependency volume looks disproportionate to the stated functionality; very large graphs should lower confidence even without a hard threshold
 
 ### D11: Licensing & Legal (weight: 4)
 
 LIC-01 - License declared:
 - Read the LICENSE file, identify the SPDX license identifier
-- Check if it's compatible (not in deny or warn lists)
+- Note if the terms look strong copyleft, source-available, noncommercial, or otherwise likely to need human review
 
 LIC-02 - Dependency licenses:
 - Read {CLONE_DIR}/artifacts/trivy-licenses.json
-- Flag any dependency licenses in the deny list: {POLICY_BLOCKED_LICENSES_DENY}
-- Warn for licenses in the warn list: {POLICY_BLOCKED_LICENSES_WARN}
+- Flag dependency licenses that look strong copyleft, source-available, unknown, or missing metadata
+- Use this file to build the full dependency-license appendix for the final report
 - If the file doesn't exist, score as N/A
 
 LIC-03 - Third-party notices:
@@ -108,13 +118,13 @@ LIC-04 - Export controls:
 
 Return your findings as a structured report with this exact format:
 
-BLOCKERS:
-- CB-04: PASS/FAIL - [evidence]
-- CB-05: PASS/FAIL - [evidence]
-- CB-07: PASS/FAIL - [evidence]
+BASELINE CHECKS:
+- CB-04: PASS/FLAG - [evidence]
+- CB-05: PASS/FLAG - [evidence]
+- CB-07: PASS/FLAG - [evidence]
 
-POLICY VIOLATIONS:
-- [list each blocked dep found, or "None found"]
+RISK FLAGS:
+- [list risky packages, install-script flags, or license concerns, or "None found"]
 
 SCORES:
 - SUP-01: [0-5] - [one-line evidence]
@@ -130,8 +140,8 @@ SCORES:
 - LIC-03: [0-5] - [one-line evidence]
 - LIC-04: [0-5] - [one-line evidence]
 
-HARD-FAIL GATES:
-- SUP-02 critical CVE gate? [VERIFIED/POTENTIAL/NO] - [evidence]
+CRITICAL FLAGS:
+- SUP-02 critical flag? [VERIFIED/POTENTIAL/NO] - [evidence]
 
 INSTALL SCRIPTS FLAGGED:
 - [hook name]: [summary of what it does]
@@ -139,6 +149,14 @@ INSTALL SCRIPTS FLAGGED:
 DEPENDENCY INVENTORY:
 - [list top 20 direct deps with versions]
 - Total direct: N, Total transitive: N
+
+FULL DEPENDENCY AND LICENSE INVENTORY:
+| Package | Version | Relationship | License | Evidence Source |
+|---------|---------|--------------|---------|-----------------|
+[list every dependency you can identify, including direct and transitive, one per row]
+[use `direct` or `transitive` for Relationship]
+[use `unknown` when the license cannot be determined]
+[use `manifest`, `lockfile`, `trivy-licenses`, or another concise source label for Evidence Source]
 
 KEY FINDINGS:
 - [bullet list of most important findings, max 5]

@@ -25,13 +25,30 @@ Assess permission boundaries, execution scope, and runtime sandboxing. Score eac
 
 Only mark `PRM-06` as `VERIFIED` when a destructive action can proceed without meaningful confirmation or an equivalent safety control. Only mark `RUN-01` as `VERIFIED` when privileged/root execution is the default or effectively required without strong justification.
 
-## Org Policy
+## Extra Research
 
-Sensitive paths the plugin must never access:
-{POLICY_SENSITIVE_PATHS}
+- If an unfamiliar sandbox, runtime helper, credential-store API, or privilege-escalation mechanism materially affects risk, use web research or vendor docs to identify it and include a concise explanation in the findings.
+- Prefer primary sources when available.
 
-Blocked capability patterns to search for:
-{POLICY_BLOCKED_PATTERNS}
+## High-Sensitivity Paths to Flag
+
+These are report flags, not automatic failures:
+
+- `~/.ssh/`
+- `~/.aws/`
+- `~/.gnupg/`
+- `~/.kube/config`
+- `~/.docker/config.json`
+- `~/.npmrc`
+- `~/.pypirc`
+- `~/.gitconfig`
+- `~/.bash_history`
+- `~/.zsh_history`
+- `~/.config/gh/`
+- `~/.claude/`
+- `/etc/passwd`
+- `/etc/shadow`
+- `/etc/hosts`
 
 ## Checklist Items
 
@@ -43,7 +60,7 @@ PRM-01 - Least privilege:
 
 PRM-02 - Filesystem scoping:
 - Search: rg -n "\.ssh|\.aws|\.gnupg|\.kube/config|\.docker/config|\.npmrc|\.pypirc|/etc/passwd|/etc/shadow|\.bash_history|\.zsh_history|\.claude/" {CLONE_DIR}
-- Flag any access to paths in the sensitive_paths policy
+- Flag any access to the high-sensitivity paths listed above
 
 PRM-03 - Process spawning:
 - Search: rg -n "child_process|execSync|execFile|spawnSync|spawn\(|subprocess|os\.system|os\.popen|Popen|ProcessBuilder" {CLONE_DIR} --type-add 'code:*.{ts,js,py,go,rs,java,rb}' -t code
@@ -94,9 +111,9 @@ SCORES:
 - RUN-04: [0-5 or N/A] - [one-line evidence]
 - RUN-05: [0-5] - [one-line evidence]
 
-HARD-FAIL GATES:
-- PRM-06 hard-fail triggered? [VERIFIED/POTENTIAL/NO] - [evidence]
-- RUN-01 hard-fail triggered? [VERIFIED/POTENTIAL/NO] - [evidence]
+CRITICAL FLAGS:
+- PRM-06 critical flag? [VERIFIED/POTENTIAL/NO] - [evidence]
+- RUN-01 critical flag? [VERIFIED/POTENTIAL/NO] - [evidence]
 
 SENSITIVE PATH ACCESS:
 - [list each sensitive path reference with file:line, or "None found"]

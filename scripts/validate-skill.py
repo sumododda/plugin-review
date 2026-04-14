@@ -28,18 +28,6 @@ ALLOWED_PROMPT_PLACEHOLDERS = {
     "CLONE_DIR",
     "ECOSYSTEM",
     "OWNER",
-    "POLICY_BLOCKED_CAPABILITIES",
-    "POLICY_BLOCKED_CAPABILITIES_TUNNELING",
-    "POLICY_BLOCKED_LICENSES_DENY",
-    "POLICY_BLOCKED_LICENSES_WARN",
-    "POLICY_BLOCKED_NETWORK",
-    "POLICY_BLOCKED_PATTERNS",
-    "POLICY_INSTALL_SCRIPTS_FLAG",
-    "POLICY_MAX_DIRECT_DEPS",
-    "POLICY_MAX_TOTAL_DEPS",
-    "POLICY_REQUIRED_FILES_HARD",
-    "POLICY_REQUIRED_FILES_SOFT",
-    "POLICY_SENSITIVE_PATHS",
     "REPO",
     "REPO_URL",
 }
@@ -47,7 +35,6 @@ ALLOWED_PROMPT_PLACEHOLDERS = {
 REQUIRED_FILES = [
     ROOT / "skill.md",
     ROOT / "README.md",
-    ROOT / "review-policy.json",
     ROOT / "unified-checklist.md",
     ROOT / "scripts" / "validate-skill.py",
     PROMPT_DIR / "manifest-auditor.md",
@@ -116,6 +103,7 @@ def validate_docs(errors: list[str]) -> None:
     readme_text = read_text(README)
     skill_text = read_text(SKILL)
     template_text = read_text(REPORT_TEMPLATE)
+    prompt_texts = {path.name: read_text(path) for path in PROMPT_FILES}
 
     if "76 checklist items" not in readme_text:
         add_error(errors, "README.md does not mention the canonical 76 checklist items")
@@ -123,21 +111,39 @@ def validate_docs(errors: list[str]) -> None:
         add_error(errors, "skill.md does not mention the canonical 76 checklist items")
     if "unified-checklist.md" not in readme_text or "unified-checklist.md" not in skill_text:
         add_error(errors, "Canonical checklist reference is missing from README.md or skill.md")
+    if "review-policy.json" in readme_text or "review-policy.json" in skill_text:
+        add_error(errors, "README.md or skill.md still references review-policy.json")
 
     d13_row = "| 13 | Dynamic Testing & Fuzzing | N/A | N/A | N/A |"
     if d13_row not in template_text:
         add_error(errors, "report-template.md does not mark D13 as fully N/A")
+    if "## Risk Level: {RISK_LEVEL}" not in template_text:
+        add_error(errors, "report-template.md does not expose the Risk Level placeholder")
+    if "{RISK_FLAGS}" not in template_text:
+        add_error(errors, "report-template.md does not expose the Risk Flags placeholder")
+    if "{FULL_DEPENDENCY_LICENSE_INVENTORY}" not in template_text:
+        add_error(errors, "report-template.md does not expose the full dependency/license inventory placeholder")
 
     required_gate_lines = {
-        "manifest-auditor.md": "SUP-02 critical CVE gate? [VERIFIED/POTENTIAL/NO] - [evidence]",
-        "code-scanner.md": "SEC-01 hard-fail triggered? [VERIFIED/POTENTIAL/NO] - [evidence]",
-        "network-mcp-scanner.md": "MCP-01 hard-fail triggered? [VERIFIED/POTENTIAL/NO] - [evidence]",
-        "permissions-runtime-scanner.md": "PRM-06 hard-fail triggered? [VERIFIED/POTENTIAL/NO] - [evidence]",
+        "manifest-auditor.md": "SUP-02 critical flag? [VERIFIED/POTENTIAL/NO] - [evidence]",
+        "code-scanner.md": "SEC-01 critical flag? [VERIFIED/POTENTIAL/NO] - [evidence]",
+        "network-mcp-scanner.md": "MCP-01 critical flag? [VERIFIED/POTENTIAL/NO] - [evidence]",
+        "permissions-runtime-scanner.md": "PRM-06 critical flag? [VERIFIED/POTENTIAL/NO] - [evidence]",
     }
     for filename, snippet in required_gate_lines.items():
-        text = read_text(PROMPT_DIR / filename)
+        text = prompt_texts[filename]
         if snippet not in text:
-            add_error(errors, f"{filename} is missing the expected hard-fail gate status line")
+            add_error(errors, f"{filename} is missing the expected critical-flag status line")
+        if "POLICY_" in text:
+            add_error(errors, f"{filename} still contains POLICY_ placeholders")
+
+    manifest_text = prompt_texts["manifest-auditor.md"]
+    if "FULL DEPENDENCY AND LICENSE INVENTORY:" not in manifest_text:
+        add_error(errors, "manifest-auditor.md is missing the full dependency/license inventory output block")
+
+    for filename, text in prompt_texts.items():
+        if "review-policy.json" in text:
+            add_error(errors, f"{filename} still references review-policy.json")
 
 
 def main() -> int:

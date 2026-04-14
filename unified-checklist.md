@@ -3,12 +3,12 @@
 This file is the canonical list of scored review items for `review-plugin`.
 
 - Default severity can be raised or lowered when the repository evidence justifies it.
-- Hard-fail gates only trigger when the finding status is `VERIFIED`.
+- Critical flags only raise the reported risk level when the finding status is `VERIFIED`.
 - `D13: Dynamic Testing & Fuzzing` has no checklist items in this skill and is always `N/A` for static review.
 
 ## D1: Secrets & Credential Security
 
-| ID | Title | Default Severity | Hard-Fail Gate |
+| ID | Title | Default Severity | Critical Flag |
 |---|---|---|---|
 | SEC-01 | Secret patterns in code and history | Critical | Yes |
 | SEC-02 | No hardcoded secrets | High | No |
@@ -19,7 +19,7 @@ This file is the canonical list of scored review items for `review-plugin`.
 
 ## D2: Static Code Analysis
 
-| ID | Title | Default Severity | Hard-Fail Gate |
+| ID | Title | Default Severity | Critical Flag |
 |---|---|---|---|
 | SCA-01 | Dangerous patterns | High | No |
 | SCA-02 | Arbitrary code execution | Critical | No |
@@ -28,7 +28,7 @@ This file is the canonical list of scored review items for `review-plugin`.
 
 ## D3: Dependency & Supply Chain
 
-| ID | Title | Default Severity | Hard-Fail Gate |
+| ID | Title | Default Severity | Critical Flag |
 |---|---|---|---|
 | SUP-01 | Dependency inventory | Medium | No |
 | SUP-02 | Known CVEs | Critical | Yes |
@@ -41,7 +41,7 @@ This file is the canonical list of scored review items for `review-plugin`.
 
 ## D4: Permissions & Execution Scope
 
-| ID | Title | Default Severity | Hard-Fail Gate |
+| ID | Title | Default Severity | Critical Flag |
 |---|---|---|---|
 | PRM-01 | Least privilege | High | No |
 | PRM-02 | Filesystem scoping | High | No |
@@ -52,7 +52,7 @@ This file is the canonical list of scored review items for `review-plugin`.
 
 ## D5: AI Agent & MCP-Specific Security
 
-| ID | Title | Default Severity | Hard-Fail Gate |
+| ID | Title | Default Severity | Critical Flag |
 |---|---|---|---|
 | MCP-01 | Prompt injection in tool descriptions | Critical | Yes |
 | MCP-02 | Output sanitization | High | No |
@@ -67,7 +67,7 @@ This file is the canonical list of scored review items for `review-plugin`.
 
 ## D6: Network & External Interactions
 
-| ID | Title | Default Severity | Hard-Fail Gate |
+| ID | Title | Default Severity | Critical Flag |
 |---|---|---|---|
 | NET-01 | Network destinations | High | No |
 | NET-02 | SSRF protection | High | No |
@@ -78,7 +78,7 @@ This file is the canonical list of scored review items for `review-plugin`.
 
 ## D7: Data Handling & Privacy
 
-| ID | Title | Default Severity | Hard-Fail Gate |
+| ID | Title | Default Severity | Critical Flag |
 |---|---|---|---|
 | DAT-01 | Data inventory | Medium | No |
 | DAT-02 | Telemetry | Medium | No |
@@ -90,7 +90,7 @@ This file is the canonical list of scored review items for `review-plugin`.
 
 ## D8: Runtime Sandboxing & Isolation
 
-| ID | Title | Default Severity | Hard-Fail Gate |
+| ID | Title | Default Severity | Critical Flag |
 |---|---|---|---|
 | RUN-01 | Minimal privileges | Critical | Yes |
 | RUN-02 | Filesystem/process isolation | High | No |
@@ -100,7 +100,7 @@ This file is the canonical list of scored review items for `review-plugin`.
 
 ## D9: Build, CI/CD & Release Integrity
 
-| ID | Title | Default Severity | Hard-Fail Gate |
+| ID | Title | Default Severity | Critical Flag |
 |---|---|---|---|
 | BLD-01 | CI workflow hardening | High | No |
 | BLD-02 | CI secrets safety | High | No |
@@ -110,7 +110,7 @@ This file is the canonical list of scored review items for `review-plugin`.
 
 ## D10: Repository Health & Maintainer Trust
 
-| ID | Title | Default Severity | Hard-Fail Gate |
+| ID | Title | Default Severity | Critical Flag |
 |---|---|---|---|
 | REP-01 | Maintainer identity | Medium | No |
 | REP-02 | Active maintenance | Medium | No |
@@ -122,7 +122,7 @@ This file is the canonical list of scored review items for `review-plugin`.
 
 ## D11: Licensing & Legal Compliance
 
-| ID | Title | Default Severity | Hard-Fail Gate |
+| ID | Title | Default Severity | Critical Flag |
 |---|---|---|---|
 | LIC-01 | License declared | Medium | No |
 | LIC-02 | Dependency licenses | High | No |
@@ -131,7 +131,7 @@ This file is the canonical list of scored review items for `review-plugin`.
 
 ## D12: Operational Security & Documentation
 
-| ID | Title | Default Severity | Hard-Fail Gate |
+| ID | Title | Default Severity | Critical Flag |
 |---|---|---|---|
 | OPS-01 | SECURITY.md | Medium | No |
 | OPS-02 | README security docs | Medium | No |

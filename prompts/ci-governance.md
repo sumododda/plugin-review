@@ -26,11 +26,19 @@ Assess CI/CD hardening, repository health, and operational documentation. Score 
 
 If `gh` is unavailable, fall back to git and repository files where possible and note the limitation in your evidence.
 
-## Org Policy
+## Extra Research
 
-Required files:
-- Hard requirement: {POLICY_REQUIRED_FILES_HARD}
-- Soft requirement: {POLICY_REQUIRED_FILES_SOFT}
+- If an unfamiliar GitHub Action, signing tool, SBOM product, release process, or maintainer organization materially affects risk, use web research or vendor docs to identify it and include a concise explanation in the findings.
+- Prefer primary sources when available.
+
+## Important Documentation to Check
+
+Flag missing or weak documentation in the report, but do not treat it as an automatic failure:
+
+- `LICENSE`
+- `README.md`
+- `SECURITY.md`
+- `CHANGELOG.md`
 
 ## Checklist Items
 

@@ -1,6 +1,6 @@
 # Plugin Security Review: {REPO_NAME}
 
-## Decision: {DECISION}
+## Risk Level: {RISK_LEVEL}
 ## Score: {SCORE}/100
 
 ---
@@ -17,13 +17,13 @@
 
 ---
 
-### Critical Blockers (Phase 0)
+### Baseline Checks
 
 | ID | Check | Result |
 |---|---|---|
 | CB-04 | LICENSE file present | {CB04} |
-| CB-05 | License compatible with org policy | {CB05} |
-| CB-07 | No obfuscated code with exfiltration | {CB07} |
+| CB-05 | License identified and noteworthy terms flagged | {CB05} |
+| CB-07 | No suspicious obfuscated code with network behavior | {CB07} |
 
 ---
 
@@ -33,9 +33,9 @@
 
 ---
 
-### Policy Violations
+### Risk Flags
 
-{POLICY_VIOLATIONS}
+{RISK_FLAGS}
 
 ---
 
@@ -60,9 +60,9 @@
 
 ---
 
-### Hard-Fail Gates
+### Critical Flags
 
-| Gate | Status | Evidence |
+| Flag | Status | Evidence |
 |---|---|---|
 | SEC-01 verified secret or private key | {GATE_SEC01} | {GATE_SEC01_EVIDENCE} |
 | SUP-02 critical CVE unmitigated | {GATE_SUP02} | {GATE_SUP02_EVIDENCE} |
@@ -90,6 +90,12 @@
 
 ---
 
+### Full Dependency And License Inventory
+
+{FULL_DEPENDENCY_LICENSE_INVENTORY}
+
+---
+
 ### Install Scripts
 
 {INSTALL_SCRIPTS}
@@ -110,7 +116,7 @@
 
 ### Re-Review Triggers
 
-This approval expires when any of these occur:
+A re-review is recommended when any of these occur:
 - Major version update released
 - New permissions requested
 - Dependency CVE with CVSS >= 7.0

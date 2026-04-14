@@ -1,0 +1,47 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "AGENTS.md"
+  ],
+  "agent": {
+    "build": {
+      "permission": {
+        "task": {
+          "*": "deny",
+          "manifest-auditor": "allow",
+          "code-scanner": "allow",
+          "permissions-runtime-scanner": "allow",
+          "network-mcp-scanner": "allow",
+          "ci-governance": "allow"
+        }
+      }
+    },
+    "plan": {
+      "permission": {
+        "task": {
+          "*": "deny",
+          "manifest-auditor": "allow",
+          "code-scanner": "allow",
+          "permissions-runtime-scanner": "allow",
+          "network-mcp-scanner": "allow",
+          "ci-governance": "allow"
+        }
+      }
+    },
+    "review-lead": {
+      "description": "Primary agent for repository audits and security reviews. Delegate work to the five task-specific review subagents and synthesize the result with evidence.",
+      "mode": "primary",
+      "prompt": "Coordinate repository reviews. Dispatch manifest-auditor, code-scanner, permissions-runtime-scanner, network-mcp-scanner, and ci-governance, then synthesize the result with evidence and the scoring rules from skill.md.",
+      "permission": {
+        "task": {
+          "*": "deny",
+          "manifest-auditor": "allow",
+          "code-scanner": "allow",
+          "permissions-runtime-scanner": "allow",
+          "network-mcp-scanner": "allow",
+          "ci-governance": "allow"
+        }
+      }
+    }
+  }
+}
